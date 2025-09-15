@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 
 type responseSuccess = {
-  valid: boolean;
+  cleanedBody: string;
 };
 
 type responseError = {
@@ -10,27 +10,28 @@ type responseError = {
 
 type responseBody = responseSuccess | responseError;
 
+const badWords = new Set(["kerfuffle", "sharbert", "fornax"]);
+
 export async function handlerValidateChirp(req: Request, resp: Response) {
   // console.log("Validating chirp...");
-  let body = ""; // 1. Initialize
+  let body = "";
 
-  // 2. Listen for data events
+  // Listen for data events
   req.on("data", (chunk) => {
     body += chunk;
   });
 
-  // console.log(`body: ${body}`);
-
-  // 3. Listen for end events
+  // Listen for end events
   req.on("end", () => {
     try {
-      const parsedBody = JSON.parse(body);
-      // now you can use `parsedBody` as a JavaScript object
-      console.log(`Parsed Body content: ${JSON.stringify(parsedBody)}`);
+      // Check for banned words
+      console.log("body:", JSON.parse(body).body);
+      const cleanBody = cleanChirp(JSON.parse(body).body);
+      console.log(`Parsed Body content: ${JSON.stringify(cleanBody)}`);
       resp.header("Content-Type", "applicaiton/json");
-      if (JSON.stringify(parsedBody).length <= 140) {
+      if (JSON.stringify(cleanBody).length <= 140) {
         const respBody: responseSuccess = {
-          valid: true,
+          cleanedBody: cleanBody,
         };
         resp.status(200).send(JSON.stringify(respBody));
       } else {
@@ -43,6 +44,16 @@ export async function handlerValidateChirp(req: Request, resp: Response) {
       resp.status(400).send("Invalid JSON");
     }
   });
+}
+
+// Clean Chirp Helper
+function cleanChirp(chirp: string): string {
+  const chirpWords = chirp.split(" ");
+  console.log("chirpwords: ", chirpWords);
+  const cleaned = chirpWords.map((word) =>
+    badWords.has(word.toLowerCase()) ? "****" : word
+  );
+  return cleaned.join(" ");
 }
 
 /*
