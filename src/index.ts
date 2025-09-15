@@ -1,4 +1,4 @@
-import { handlerMetrics, handlerResetMetrics } from "./api/metrics.js";
+import { handlerMetrics, handlerResetMetrics } from "./admin/metrics.js";
 import { handlerReadiness } from "./api/readiness.js";
 import {
   middlewareLogResponses,
@@ -14,9 +14,9 @@ app.use(middlewareLogResponses);
 
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
-app.get("/healthz", handlerReadiness);
-app.get("/metrics", handlerMetrics);
-app.get("/reset", handlerResetMetrics);
+app.get("/api/healthz", handlerReadiness);
+app.get("/admin/metrics", handlerMetrics);
+app.post("/admin/reset", handlerResetMetrics);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
