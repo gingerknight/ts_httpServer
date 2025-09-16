@@ -1,4 +1,10 @@
 import { config } from "../config.js";
+import {
+  BadRequest,
+  Forbidden,
+  NotFoundError,
+  Unauthorized,
+} from "../errors.js";
 
 import type { Request, Response, NextFunction } from "express";
 
@@ -9,7 +15,7 @@ export function middlewareLogResponses(
 ) {
   resp.on("finish", () => {
     // catch status-code, look for non-ok
-    if (resp.statusCode !== 200) {
+    if (resp.statusCode >= 300) {
       console.log(
         `[NON-OK] ${req.method} ${req.url} - Status: ${resp.statusCode}`
       );
@@ -31,4 +37,29 @@ export function middlewareMetricsInc(
   // console.log("Req method:", req.method);
   // console.log("Req path:", req.path);
   next();
+}
+
+export function middlewareErrorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  console.error("We gotza an error here!");
+  if (err instanceof BadRequest) {
+    res.status(400).json({
+      error: err.message,
+    });
+  } else if (err instanceof Unauthorized) {
+    res.status(401).send(err);
+  } else if (err instanceof Forbidden) {
+    res.status(403).send(err);
+  } else if (err instanceof NotFoundError) {
+    res.status(404).send(err);
+  } else {
+    res.status(500).json({
+      error: "Something went wrong on our end",
+    });
+    console.log(err);
+  }
 }

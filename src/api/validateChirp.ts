@@ -1,4 +1,10 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+import {
+  BadRequest,
+  Forbidden,
+  NotFoundError,
+  Unauthorized,
+} from "../errors.js";
 
 type responseSuccess = {
   cleanedBody: string;
@@ -11,8 +17,13 @@ type responseError = {
 type responseBody = responseSuccess | responseError;
 
 const badWords = new Set(["kerfuffle", "sharbert", "fornax"]);
+const maxChirpLength = 140;
 
-export async function handlerValidateChirp(req: Request, resp: Response) {
+export async function handlerValidateChirp(
+  req: Request,
+  resp: Response,
+  next: NextFunction
+) {
   // console.log("Validating chirp...");
   let body = "";
 
@@ -35,13 +46,12 @@ export async function handlerValidateChirp(req: Request, resp: Response) {
         };
         resp.status(200).send(JSON.stringify(respBody));
       } else {
-        const respBody: responseError = {
-          error: "Chirp is too long",
-        };
-        resp.status(400).send(JSON.stringify(respBody));
+        throw new BadRequest(
+          `Chirp is too long. Max length is ${maxChirpLength}`
+        );
       }
     } catch (error) {
-      resp.status(400).send("Invalid JSON");
+      next(error); // Pass error to express to handle through middleware
     }
   });
 }
