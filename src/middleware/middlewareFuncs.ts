@@ -32,8 +32,8 @@ export function middlewareMetricsInc(
   // skip metrics/reset
   if (req.path === "/metrics" || req.path === "/reset") return next();
 
-  config.fileserverHits += 1;
-  // console.log(`hits count: ${config.fileserverHits}`);
+  config.api.fileServerHits += 1;
+  // console.log(`hits count: ${config.api.fileserverHits}`);
   // console.log("Req method:", req.method);
   // console.log("Req path:", req.path);
   next();
