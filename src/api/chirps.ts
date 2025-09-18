@@ -78,7 +78,6 @@ export async function handlerChirps(
     // Check for banned words
 
     const cleanBody = await handlerValidateChirp(userChirp.body);
-    // console.log(`Parsed Body content: ${JSON.stringify(cleanBody)}`);
     userChirp.body = cleanBody;
     const result = await insertChirp(userChirp);
     console.log(result);

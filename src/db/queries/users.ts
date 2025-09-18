@@ -1,13 +1,18 @@
 import { db } from "../index.js";
-import { type NewUser, users } from "../../schema.js";
+import { type NewUser, users, type PublicUser } from "../../schema.js";
 import { Conflict } from "../../errors.js";
 
-export async function createUser(user: NewUser) {
+export async function createUser(user: NewUser): Promise<PublicUser> {
   const [result] = await db
     .insert(users)
     .values(user)
     .onConflictDoNothing()
-    .returning();
+    .returning({
+      id: users.id,
+      email: users.email,
+      createdAt: users.createdAt,
+      updatedAt: users.updatedAt,
+    });
   if (!result) throw new Conflict("User already exists");
   return result;
 }
