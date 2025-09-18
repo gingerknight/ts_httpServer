@@ -14,13 +14,9 @@ export async function createNewUser(
     password: string;
   };
   const body: parameters = req.body;
-  console.log(`Body: ${body}`);
 
   try {
     // Parse into JSON
-    console.log("body:", body.email);
-    console.log(`Parsed Body content: ${JSON.stringify(body)}`);
-
     console.log("Hashing Password...");
     const hashedPass = await hashPassword(body.password);
 
@@ -28,10 +24,10 @@ export async function createNewUser(
       email: body.email,
       hashedPassword: hashedPass,
     };
-    const result = await createUser(userData);
-    console.log(result);
 
-    //resp.send("User created");
+    console.log("Creating user...");
+    const result = await createUser(userData);
+
     resp.statusMessage = "Created";
     resp.status(201).json(result);
   } catch (error) {

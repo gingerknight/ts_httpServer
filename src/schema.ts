@@ -18,7 +18,7 @@ export const users = pgTable("users", {
 });
 
 export type NewUser = typeof users.$inferInsert;
-export type PublicUser = Omit<typeof users.$inferInsert, "hashedPassword">;
+export type PublicUser = Omit<typeof users.$inferSelect, "hashedPassword">;
 
 /*
 {

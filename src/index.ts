@@ -6,6 +6,7 @@ import {
   handlerGetChirp,
 } from "./api/chirps.js";
 import { createNewUser } from "./api/createUsers.js";
+import { handlerUserLogin } from "./api/userLogin.js";
 
 import {
   middlewareLogResponses,
@@ -37,6 +38,7 @@ app.post("/admin/reset", handlerResetData);
 // app.post("/api/validate_chirp", handlerValidateChirp);
 app.post("/api/chirps", handlerChirps);
 app.post("/api/users", createNewUser);
+app.post("/api/login", handlerUserLogin);
 
 app.use(middlewareErrorHandler);
 

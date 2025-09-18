@@ -11,11 +11,10 @@ export function hashPassword(plaintextPassword: string): Promise<string> {
   return hashedPassword;
 }
 
-/*
 export function checkPasswordHash(
   password: string,
   hash: string
 ): Promise<boolean> {
   // Use the bcrypt.compare function to compare the password in the HTTP request with the password that is stored in the database.
+  return bcrypt.compare(password, hash);
 }
-  */
