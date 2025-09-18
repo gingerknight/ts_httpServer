@@ -58,7 +58,7 @@ export function middlewareErrorHandler(
   } else if (err instanceof NotFoundError) {
     res.status(404).send(err.message);
   } else if (err instanceof Conflict) {
-    res.status(409).send(err);
+    res.status(409).send(err.message);
   } else {
     res.status(500).json({
       error: "Something went wrong on our end",

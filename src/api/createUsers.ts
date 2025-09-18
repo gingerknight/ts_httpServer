@@ -25,8 +25,7 @@ export async function createNewUser(
 
     //resp.send("User created");
     resp.statusMessage = "Created";
-    resp.header("Content-Type", "applicaiton/json");
-    resp.status(201).send(result);
+    resp.status(201).json(result);
   } catch (error) {
     next(error); // Pass error to express to handle through middleware
   }

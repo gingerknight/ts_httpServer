@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1758167939266,
+      "tag": "0000_round_night_thrasher",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758169999966,
+      "tag": "0001_add_chirps_table",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758170671890,
+      "tag": "0002_free_kate_bishop",
+      "breakpoints": true
+    }
+  ]
+}

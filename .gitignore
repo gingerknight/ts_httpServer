@@ -35,6 +35,3 @@ Thumbs.db
 .env.*.local
 drizzle.config.ts
 
-# DB Metadata
-src/db/meta/*
-src/db/migrations/meta/*
