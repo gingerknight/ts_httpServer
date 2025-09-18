@@ -1,0 +1,1 @@
+ALTER TABLE "chirps" ALTER COLUMN "body" SET NOT NULL;

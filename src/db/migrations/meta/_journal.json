@@ -22,6 +22,13 @@
       "when": 1758170671890,
       "tag": "0002_free_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758174229679,
+      "tag": "0003_careful_flatman",
+      "breakpoints": true
     }
   ]
 }
