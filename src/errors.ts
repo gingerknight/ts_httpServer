@@ -26,3 +26,9 @@ export class BadRequest extends Error {
     this.name = "BadRequest";
   }
 }
+export class Conflict extends Error {
+  constructor(message = "Duplicate conflict") {
+    super(message);
+    this.name = "Conflict";
+  }
+}

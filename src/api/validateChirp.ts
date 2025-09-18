@@ -24,43 +24,34 @@ export async function handlerValidateChirp(
   resp: Response,
   next: NextFunction
 ) {
-  // console.log("Validating chirp...");
-  let body = "";
+  type parameters = {
+    body: string;
+  };
+  const body: parameters = req.body;
+  console.log(`Body: ${body}`);
 
-  // Listen for data events
-  req.on("data", (chunk) => {
-    body += chunk;
-    if (body.length > 1_000_000) req.destroy(); // Prevent DoS
-  });
-
-  // Listen for end events
-  req.on("end", () => {
-    try {
-      // Check for banned words
-      console.log("body:", JSON.parse(body).body);
-      const cleanBody = cleanChirp(JSON.parse(body).body);
-      console.log(`Parsed Body content: ${JSON.stringify(cleanBody)}`);
-      resp.header("Content-Type", "applicaiton/json");
-      if (JSON.stringify(cleanBody).length <= 140) {
-        const respBody: responseSuccess = {
-          cleanedBody: cleanBody,
-        };
-        resp.status(200).send(JSON.stringify(respBody));
-      } else {
-        throw new BadRequest(
-          `Chirp is too long. Max length is ${maxChirpLength}`
-        );
-      }
-    } catch (error) {
-      next(error); // Pass error to express to handle through middleware
-    }
-  });
+  // check headers
+  // console.log(`Checking headers: ${req.headers["content-type"]}`);
+  if (body.body.length > maxChirpLength) {
+    throw new BadRequest(`Chirp is too long. Max length is ${maxChirpLength}`);
+  }
+  try {
+    // Check for banned words
+    const cleanBody = cleanChirp(body.body);
+    // console.log(`Parsed Body content: ${JSON.stringify(cleanBody)}`);
+    const respBody: responseSuccess = {
+      cleanedBody: cleanBody,
+    };
+    resp.status(200).send(JSON.stringify(respBody));
+  } catch (error) {
+    next(error); // Pass error to express to handle through middleware
+  }
 }
 
 // Clean Chirp Helper
 function cleanChirp(chirp: string): string {
   const chirpWords = chirp.split(" ");
-  console.log("chirpwords: ", chirpWords);
+  // console.log("chirpwords: ", chirpWords);
   const cleaned = chirpWords.map((word) =>
     badWords.has(word.toLowerCase()) ? "****" : word
   );

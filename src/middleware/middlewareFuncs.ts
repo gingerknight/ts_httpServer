@@ -1,6 +1,7 @@
 import { config } from "../config.js";
 import {
   BadRequest,
+  Conflict,
   Forbidden,
   NotFoundError,
   Unauthorized,
@@ -51,11 +52,13 @@ export function middlewareErrorHandler(
       error: err.message,
     });
   } else if (err instanceof Unauthorized) {
-    res.status(401).send(err);
+    res.status(401).send(err.message);
   } else if (err instanceof Forbidden) {
-    res.status(403).send(err);
+    res.status(403).send(err.message);
   } else if (err instanceof NotFoundError) {
-    res.status(404).send(err);
+    res.status(404).send(err.message);
+  } else if (err instanceof Conflict) {
+    res.status(409).send(err);
   } else {
     res.status(500).json({
       error: "Something went wrong on our end",
