@@ -1,6 +1,8 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { makeJWT, validateJWT } from "../lib/auth";
+import { describe, it, expect, beforeAll, vi } from "vitest";
+import { getBearerToken, makeJWT, validateJWT } from "../lib/auth";
 import { hashPassword, checkPasswordHash } from "../lib/auth";
+import type { Request } from "express";
+import { BadRequest } from "../errors";
 
 describe("Password Hashing", () => {
   const password1 = "correctPassword123!";
@@ -59,5 +61,39 @@ describe("JWT Creation", () => {
     expect(() => validateJWT(userJwt3, secret1)).toThrow(
       "Token invalid or expired..."
     );
+  });
+});
+
+describe("getBearerToken", () => {
+  const buildRequest = (Authorization?: string) => {
+    const get = vi.fn(() => Authorization ?? undefined);
+    const req = { get } as unknown as Request;
+    return { req, get };
+  };
+  it("returns the raw token with Autohrization uses 'Bearer'", () => {
+    const token = "the-actual-bearer-token";
+    const { req, get } = buildRequest(`Bearer ${token}`);
+    const result = getBearerToken(req);
+
+    expect(get).toHaveBeenCalledWith("Authorization");
+    expect(result).toBe(token);
+  });
+  it("should throw BadRequest missing Authorization", () => {
+    const token = "the-actual-bearer-token";
+    const { req, get } = buildRequest(`SandySquirrel ${token}`);
+    expect(() => getBearerToken(req)).toThrowError(BadRequest);
+  });
+  it("should throw BadRequest missing token", () => {
+    const token = "the-actual-bearer-token";
+    const { req, get } = buildRequest(`Bearer      `);
+    expect(() => getBearerToken(req)).toThrowError(BadRequest);
+  });
+  it("returns the raw token and handles weird spacing", () => {
+    const token = "the-actual-bearer-token";
+    const { req, get } = buildRequest(`    Bearer    ${token}   `);
+
+    const result = getBearerToken(req);
+    expect(get).toHaveBeenCalledWith("Authorization");
+    expect(result).toBe(token);
   });
 });

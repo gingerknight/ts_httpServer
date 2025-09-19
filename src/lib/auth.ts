@@ -1,7 +1,8 @@
 import * as jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { Unauthorized } from "../errors.js";
+import { BadRequest, Unauthorized } from "../errors.js";
+import type { Request } from "express";
 
 type Payload = Pick<jwt.JwtPayload, "iss" | "sub" | "iat" | "exp">;
 const ISSUE = "chirpy";
@@ -64,5 +65,23 @@ export function validateJWT(tokenString: string, secret: string): string {
     return result.sub;
   } catch (err) {
     throw new Unauthorized("Token invalid or expired...");
+  }
+}
+
+export function getBearerToken(req: Request): string {
+  // This function should look for the Authorization header in the request and return the TOKEN_STRING if it exists (stripping off the Bearer prefix and whitespace).
+  // You can use the request's .get method.
+  // If the header doesn't exist, throw an error.
+  // This is an easy one to write a unit test for, and I'd recommend doing so.
+  const tokenString = req.get("Authorization");
+  if (tokenString) {
+    const [bearer, token] = tokenString.trim().split(" ").filter(Boolean);
+    if (bearer === "Bearer" && token) {
+      return token;
+    } else {
+      throw new BadRequest("Missing Bearer header...");
+    }
+  } else {
+    throw new BadRequest("Bad request, missing Authorization...");
   }
 }
