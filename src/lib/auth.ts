@@ -1,4 +1,4 @@
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { BadRequest, Unauthorized } from "../errors.js";

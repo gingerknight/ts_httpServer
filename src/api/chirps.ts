@@ -3,9 +3,11 @@ import * as z from "zod";
 import { getChirp, insertChirp } from "../db/queries/chirps.js";
 import { handlerValidateChirp } from "../lib/validation/validateChirp.js";
 import { getChirps } from "../db/queries/chirps.js";
-import { BadRequest, NotFoundError } from "../errors.js";
+import { BadRequest } from "../errors.js";
 
 import type { NextFunction, Request, Response } from "express";
+import { getBearerToken, validateJWT } from "../lib/auth.js";
+import { config } from "../config.js";
 
 export async function handlerGetChirp(req: Request, resp: Response) {
   console.log("Fetching single chirp");
@@ -50,7 +52,7 @@ export async function handlerChirps(
 ) {
   const UserChirp = z.object({
     body: z.string(),
-    userId: z.string(),
+    userId: z.string().optional(),
   });
 
   const userChirp = UserChirp.parse(req.body);
@@ -59,10 +61,14 @@ export async function handlerChirps(
   // Sample POST body
   {
     "body": "Hello, world!",
-    "userId": "123e4567-e89b-12d3-a456-426614174000"
   }
   */
   try {
+    // Check for Authorization Header and Valid token
+    const authToken = getBearerToken(req);
+    const userId = validateJWT(authToken, config.api.secret);
+    userChirp.userId = userId;
+
     // Check for banned words
     const cleanBody = await handlerValidateChirp(userChirp.body);
     userChirp.body = cleanBody;
