@@ -85,3 +85,11 @@ export function getBearerToken(req: Request): string {
     throw new BadRequest("Bad request, missing Authorization...");
   }
 }
+
+/*
+Add a makeRefreshToken function to your auth.ts file. It should use the following to generate a random 256-bit (32-byte) hex-encoded string:
+
+    crypto.randomBytes() to generate 32 bytes (256 bits) of random data from the built-in crypto module.
+    .toString() to convert the random data to a hex string. Just pass in 'hex' as the argument.
+*/
+//export function makeRefreshToken(req)
