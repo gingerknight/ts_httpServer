@@ -1,14 +1,14 @@
-# TypeScript Web Server from Scratch
+# TypeScript Web Server with JWT, and PostgresDB
 
-This project is a guided exploration of how to build and host a web server using TypeScript with minimal reliance on frameworks or heavy libraries. It’s designed to provide a deep understanding of how the web works under the hood, rather than just wiring together existing tooling.
+Chirpy is a TypeScript/Express service that exposes a small social feed with JWT auth, refresh tokens, and admin utilities. It boots an HTTP API, bundles minimal static assets for /app, and includes helpers for validation, metrics, and error handling.
 
 ## Goals of This Project
 
 - Understand the fundamentals of web servers
 > Learn what a web server is, how it handles HTTP requests, and how it powers real-world web applications.
 
-- Build an HTTP server from scratch
-> Implement routing, request parsing, and response handling in TypeScript without frameworks like Express, Koa, or Fastify.
+- Build an HTTP server 
+> Implement routing, request parsing, and response handling in TypeScript with a framework. (Express)
 
 - Learn TypeScript for backend development
 > Explore how TypeScript’s static typing improves developer experience, correctness, and maintainability.
@@ -30,47 +30,81 @@ While it’s not production-ready or feature-complete, Chirpy demonstrates all t
 
 ## Tech Stack
 
-- TypeScript — the primary development language
-- Node.js (HTTP module) — powering the low-level web server logic
-- No frameworks — everything is implemented manually for learning purposes
-- Lightweight utilities only — minimal external dependencies (e.g. for development tooling)
+- Runtime: Node.js 20 (see .nvmrc)
+- Frameworks: Express 5, Drizzle ORM over Postgres
+- Tooling: pnpm, TypeScript, Vitest, Zod, Bcrypt, JSON Web Tokens
+- Storage: PostgreSQL with migration support via drizzle-kit
 
 ### Project Structure
 
 ```
 ├── src/
-│   ├── server.ts          # Entry point
-│   ├── routes/             # Request handlers
-│   ├── utils/               # Helper functions
-│   └── types/               # Type definitions
-├── public/                 # Static assets (HTML/CSS/JS)
-├── templates/              # HTML templates
-├── config.ts
-├── package.json
-├── tsconfig.json
+│   ├── api/            # Route handlers (chirps, auth, tokens, readiness)
+│   ├── admin/          # Metrics and reset endpoints
+│   ├── app/            # Static assets served under /app
+│   ├── db/             # Drizzle config, queries, migrations
+│   ├── lib/            # Auth, validation helpers
+│   ├── middleware/     # Logging, metrics, error handlers
+│   ├── schema.ts       # Drizzle table definitions
+│   └── test/           # Vitest suites
+├── dist/               # Build output
+├── drizzle.config.ts   # Migration generator config
 └── README.md
+
 ```
 
 ### Running the Project
 
-```
-# Install dependencies
-npm install
+####  Prequisites
 
-# Build the project (TS -> JS)
-npm run build
 
-# Start the server
-npm run dev
+- Install pnpm (npm install -g pnpm) and use Node 20 (nvm use handles it).
+- Ensure PostgreSQL is running locally and reachable with the connection string used in .env.
+- Copy `.env.example` (if present) or create `.env` with **PORT, PLATFORM, SECRET, DB_URL**.
+- Run `pnpm install` from the project root.
+
+
+#### Setup & Commands
+
 ```
+pnpm install — install dependencies
+pnpm build — compile TypeScript into dist/
+pnpm dev — rebuild then start the API
+pnpm start — run the pre-built JS in production mode
+pnpm test — execute Vitest suite
+```
+
+#### Database Migrations
+- `pnpm migrate` — apply pending migrations (server also auto-runs on boot via src/index.ts)
+- `pnpm generate` — diff current schema (src/schema.ts) against the database and emit a new SQL migration into src/db/migrations/
+> [!Caution]
+> Deleting or hand-editing migrations is unsafe; additive migrations or reset the DB in dev if needed.
+
+## Testing & Coverage
+
+- Tests live under `src/test/` and use Vitest.
+- `pnpm test` runs all suites; add a note that 
+> [!Tip]
+> coverage requires `pnpm add -D @vitest/coverage-v8` and then `pnpm coverage` 
+
+## API Definitions
+
+- POST /api/users — create account (hashes password with bcrypt)
+- POST /api/login — issue JWT and refresh token (records token in DB)
+- POST /api/chirps — create chirp after header-based auth/validation
+- GET /api/chirps, GET /api/chirps/:id — fetch chirps
+- POST /api/refresh / POST /api/revoke — manage refresh tokens
+- GET /api/healthz, GET /admin/metrics, POST /admin/reset — readiness and admin utilities
+> [!Note]
+> Requests needing auth expect a Bearer refresh token and JWT secret configured via `.env`.
 
 ## Next Steps
 
 **Future improvements could include:**
 
 - Markdown-powered blog posts
-- Persistent storage with a database
-- Authentication and sessions
+- Further development of FrontEnd for use in WebBrowser
+- Implement API Documentation like Swagger & JSDocs
 - Deployment to AWS ECS or EC2
 
 ## About This Project
