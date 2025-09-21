@@ -30,12 +30,10 @@ describe("Password Hashing", () => {
 
 describe("JWT Creation", () => {
   const userId1 = "0001";
-  const expiresIn1 = 50000;
   const secret1 = "spongebob";
 
   const userId2 = "0002";
-  const expiresIn2 = 50000;
-  const expiresIn3 = 0;
+  const expiresIn3 = -1;
   const secret2 = "patrick-star";
 
   let userJwt1: string;
@@ -43,9 +41,9 @@ describe("JWT Creation", () => {
   let userJwt3: string;
 
   beforeAll(async () => {
-    userJwt1 = await makeJWT(userId1, expiresIn1, secret1);
-    userJwt2 = await makeJWT(userId2, expiresIn2, secret2);
-    userJwt3 = await makeJWT(userId1, expiresIn3, secret1);
+    userJwt1 = await makeJWT(userId1, secret1);
+    userJwt2 = await makeJWT(userId2, secret2);
+    userJwt3 = await makeJWT(userId1, secret1, expiresIn3);
   });
 
   it("should return the userId", async () => {

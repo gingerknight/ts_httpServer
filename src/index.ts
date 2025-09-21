@@ -19,6 +19,7 @@ import express from "express";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { handlerRefreshToken, handlerRevokeToken } from "./api/token.js";
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
@@ -39,6 +40,8 @@ app.post("/admin/reset", handlerResetData);
 app.post("/api/chirps", handlerChirps);
 app.post("/api/users", createNewUser);
 app.post("/api/login", handlerUserLogin);
+app.post("/api/refresh", handlerRefreshToken);
+app.post("/api/revoke", handlerRevokeToken);
 
 app.use(middlewareErrorHandler);
 

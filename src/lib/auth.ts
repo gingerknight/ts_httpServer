@@ -3,6 +3,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { BadRequest, Unauthorized } from "../errors.js";
 import type { Request } from "express";
+import { randomBytes } from "crypto";
 
 type Payload = Pick<jwt.JwtPayload, "iss" | "sub" | "iat" | "exp">;
 const ISSUE = "chirpy";
@@ -24,11 +25,11 @@ export function checkPasswordHash(
 
 export function makeJWT(
   userID: string,
-  expiresIn: number,
-  secret: string
+  secret: string,
+  expiresIn?: number
 ): string {
   const issuedAt = Math.floor(Date.now() / 1000);
-  const expiresAt = expiresIn + issuedAt;
+  const expiresAt = (expiresIn || 3600) + issuedAt;
   // Use jwt.sign(payload, secret, [options]).
   const payload = {
     iss: ISSUE,
@@ -86,10 +87,9 @@ export function getBearerToken(req: Request): string {
   }
 }
 
-/*
-Add a makeRefreshToken function to your auth.ts file. It should use the following to generate a random 256-bit (32-byte) hex-encoded string:
-
-    crypto.randomBytes() to generate 32 bytes (256 bits) of random data from the built-in crypto module.
-    .toString() to convert the random data to a hex string. Just pass in 'hex' as the argument.
-*/
-//export function makeRefreshToken(req)
+export function makeRefreshToken() {
+  const randomString = randomBytes(256).toString("hex");
+  let now = new Date();
+  const expiresAt: Date = new Date(now.setDate(now.getDate() + 60));
+  return { randomString, expiresAt };
+}

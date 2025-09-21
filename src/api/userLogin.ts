@@ -1,10 +1,11 @@
 import { lookupUser } from "../db/queries/users.js";
-import { checkPasswordHash, makeJWT } from "../lib/auth.js";
+import { checkPasswordHash, makeJWT, makeRefreshToken } from "../lib/auth.js";
 import { BadRequest, Unauthorized } from "../errors.js";
 
 import type { NextFunction, Request, Response } from "express";
 import * as z from "zod";
 import { config } from "../config.js";
+import { insertRefreshToken } from "../db/queries/auth.js";
 
 export async function handlerUserLogin(
   req: Request,
@@ -14,7 +15,6 @@ export async function handlerUserLogin(
   const UserInfo = z.object({
     email: z.string(),
     password: z.string(),
-    expiresInSeconds: z.number().max(3600).catch(3600),
   });
 
   try {
@@ -37,17 +37,21 @@ export async function handlerUserLogin(
       if (authSuccess) {
         // successful authentication
         // create token
-        const userToken = makeJWT(
-          privateUser.id,
-          body.data.expiresInSeconds || 3600,
-          config.api.secret
-        );
+        const userToken = makeJWT(privateUser.id, config.api.secret);
+        const { randomString: refreshToken, expiresAt: expiration } =
+          makeRefreshToken();
+        insertRefreshToken({
+          token: refreshToken,
+          userId: privateUser.id,
+          expiresAt: expiration,
+        });
         resp.status(200).json({
           id: privateUser.id,
           email: privateUser.email,
           createdAt: privateUser.createdAt,
           updatedAt: privateUser.updatedAt,
           token: userToken,
+          refreshToken: refreshToken,
         });
       } else {
         throw new Unauthorized("Incorrect email or password");

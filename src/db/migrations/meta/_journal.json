@@ -43,6 +43,13 @@
       "when": 1758345078372,
       "tag": "0005_new_white_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1758475685158,
+      "tag": "0006_equal_reaper",
+      "breakpoints": true
     }
   ]
 }
