@@ -1,4 +1,4 @@
-import { lookupUser } from "../db/queries/users.js";
+import { lookupUserByEmail } from "../db/queries/users.js";
 import { checkPasswordHash, makeJWT, makeRefreshToken } from "../lib/auth.js";
 import { BadRequest, Unauthorized } from "../errors.js";
 
@@ -27,7 +27,7 @@ export async function handlerUserLogin(
     }
     console.log("Checking login...");
     // get user by email
-    const privateUser = await lookupUser(body.data.email);
+    const privateUser = await lookupUserByEmail(body.data.email);
     if (privateUser) {
       // compare pass/hash
       const authSuccess: boolean = await checkPasswordHash(

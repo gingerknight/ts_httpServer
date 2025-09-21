@@ -70,10 +70,6 @@ export function validateJWT(tokenString: string, secret: string): string {
 }
 
 export function getBearerToken(req: Request): string {
-  // This function should look for the Authorization header in the request and return the TOKEN_STRING if it exists (stripping off the Bearer prefix and whitespace).
-  // You can use the request's .get method.
-  // If the header doesn't exist, throw an error.
-  // This is an easy one to write a unit test for, and I'd recommend doing so.
   const tokenString = req.get("Authorization");
   if (tokenString) {
     const [bearer, token] = tokenString.trim().split(" ").filter(Boolean);
@@ -83,7 +79,7 @@ export function getBearerToken(req: Request): string {
       throw new BadRequest("Missing Bearer header...");
     }
   } else {
-    throw new BadRequest("Bad request, missing Authorization...");
+    throw new Unauthorized("Bad request, missing Authorization...");
   }
 }
 
