@@ -1,6 +1,8 @@
+import * as z from "zod";
+
 import { db } from "../index.js";
 import { type NewUser, users, type PublicUser } from "../../schema.js";
-import { Conflict } from "../../errors.js";
+import { Conflict, BadRequest } from "../../errors.js";
 import { eq } from "drizzle-orm";
 
 type UpdateUserInput = {
@@ -61,5 +63,16 @@ export async function updateUser(user: UpdateUserInput): Promise<PublicUser> {
       isChirpyRed: users.isChirpyRed,
     });
   if (!result) throw new Error("Unable to update user's hash password...");
+  return result;
+}
+
+export async function upgradeUser(user: string) {
+  const values = { isChirpyRed: true };
+  const [result] = await db
+    .update(users)
+    .set(values)
+    .where(eq(users.id, user))
+    .returning();
+  if (!result) throw new Conflict("Failed to update user to ChirpyRed");
   return result;
 }

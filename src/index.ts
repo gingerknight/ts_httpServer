@@ -10,6 +10,7 @@ import { createNewUser } from "./api/createUsers.js";
 import { handlerUserLogin } from "./api/userLogin.js";
 import { handlerRefreshToken, handlerRevokeToken } from "./api/token.js";
 import { handlerUpdateUser } from "./api/userUpdate.js";
+import { handlerPolkaWebhook } from "./webhooks/webhooks.js";
 
 import {
   middlewareLogResponses,
@@ -46,6 +47,7 @@ app.post("/api/refresh", handlerRefreshToken);
 app.post("/api/revoke", handlerRevokeToken);
 app.put("/api/users", handlerUpdateUser);
 app.delete("/api/chirps/:chirpID", handlerDeleteChirp);
+app.post("/api/polka/webhooks", handlerPolkaWebhook);
 
 app.use(middlewareErrorHandler);
 

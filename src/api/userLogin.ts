@@ -13,7 +13,7 @@ export async function handlerUserLogin(
   next: NextFunction
 ) {
   const UserInfo = z.object({
-    email: z.string(),
+    email: z.email(),
     password: z.string(),
   });
 
@@ -52,6 +52,7 @@ export async function handlerUserLogin(
           updatedAt: privateUser.updatedAt,
           token: userToken,
           refreshToken: refreshToken,
+          isChirpyRed: privateUser.isChirpyRed,
         });
       } else {
         throw new Unauthorized("Incorrect email or password");
