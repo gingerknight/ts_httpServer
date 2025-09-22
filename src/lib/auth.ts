@@ -83,6 +83,21 @@ export function getBearerToken(req: Request): string {
   }
 }
 
+export function getAPIKey(req: Request): string {
+  // Authorization: ApiKey THE_KEY_HERE
+  const tokenString = req.get("Authorization");
+  if (tokenString) {
+    const [bearer, token] = tokenString.trim().split(" ").filter(Boolean);
+    if (bearer === "ApiKey" && token) {
+      return token;
+    } else {
+      throw new BadRequest("Missing Bearer header...");
+    }
+  } else {
+    throw new Unauthorized("Bad request, missing Authorization...");
+  }
+}
+
 export function makeRefreshToken() {
   const randomString = randomBytes(256).toString("hex");
   let now = new Date();
