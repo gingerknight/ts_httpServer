@@ -1,9 +1,9 @@
 import * as z from "zod";
 
-import { getChirp, insertChirp } from "../db/queries/chirps.js";
+import { deleteChirp, getChirp, insertChirp } from "../db/queries/chirps.js";
 import { handlerValidateChirp } from "../lib/validation/validateChirp.js";
 import { getChirps } from "../db/queries/chirps.js";
-import { BadRequest } from "../errors.js";
+import { BadRequest, Forbidden, NotFoundError } from "../errors.js";
 
 import type { NextFunction, Request, Response } from "express";
 import { getBearerToken, validateJWT } from "../lib/auth.js";
@@ -79,5 +79,33 @@ export async function handlerChirps(
     resp.status(201).send(result);
   } catch (error) {
     next(error); // Pass error to express to handle through middleware
+  }
+}
+
+export async function handlerDeleteChirp(
+  req: Request,
+  resp: Response,
+  next: NextFunction
+) {
+  try {
+    const authToken = getBearerToken(req);
+    const userId = validateJWT(authToken, config.api.secret);
+
+    const chirpId = req.params.chirpID;
+    if (chirpId) {
+      const singleChirp = await getChirp(chirpId);
+      if (userId === singleChirp.userId) {
+        const result = await deleteChirp(chirpId);
+        resp.status(204).json(result);
+      } else {
+        console.log(`${userId} does not match ${singleChirp.userId}`);
+        throw new Forbidden("User id's do not match...");
+      }
+    } else {
+      throw new NotFoundError("Chirp ID missing...");
+    }
+  } catch (error) {
+    console.log(`Error: ${error}`);
+    next(error);
   }
 }

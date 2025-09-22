@@ -4,6 +4,7 @@ import {
   handlerChirps,
   handlerAllChirps,
   handlerGetChirp,
+  handlerDeleteChirp,
 } from "./api/chirps.js";
 import { createNewUser } from "./api/createUsers.js";
 import { handlerUserLogin } from "./api/userLogin.js";
@@ -44,6 +45,7 @@ app.post("/api/login", handlerUserLogin);
 app.post("/api/refresh", handlerRefreshToken);
 app.post("/api/revoke", handlerRevokeToken);
 app.put("/api/users", handlerUpdateUser);
+app.delete("/api/chirps/:chirpID", handlerDeleteChirp);
 
 app.use(middlewareErrorHandler);
 

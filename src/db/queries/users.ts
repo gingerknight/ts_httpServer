@@ -19,6 +19,7 @@ export async function createUser(user: NewUser): Promise<PublicUser> {
       email: users.email,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
+      isChirpyRed: users.isChirpyRed,
     });
   if (!result) throw new Conflict("User already exists");
   return result;
@@ -32,10 +33,7 @@ export async function deletedUserIds() {
 export async function lookupUserByEmail(
   email: string
 ): Promise<typeof users.$inferSelect | undefined> {
-  const [results] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email));
+  const [results] = await db.select().from(users).where(eq(users.email, email));
   return results;
 }
 
@@ -60,8 +58,8 @@ export async function updateUser(user: UpdateUserInput): Promise<PublicUser> {
       email: users.email,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
+      isChirpyRed: users.isChirpyRed,
     });
-  if (!result)
-    throw new Error("Unable to update user's hash password...");
+  if (!result) throw new Error("Unable to update user's hash password...");
   return result;
 }
