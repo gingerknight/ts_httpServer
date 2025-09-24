@@ -1,5 +1,8 @@
 # TypeScript Web Server with JWT, and PostgresDB
 
+> [!Note] 
+> This is a guided project from Boot.dev to build and learn HTTP/Web servers in Typescript. The build creates similar features as a social network like Twitter.
+
 Chirpy is a TypeScript/Express service that exposes a small social feed with JWT auth, refresh tokens, and admin utilities. It boots an HTTP API, bundles minimal static assets for /app, and includes helpers for validation, metrics, and error handling.
 
 ## Goals of This Project
