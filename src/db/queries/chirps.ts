@@ -1,6 +1,6 @@
 import { db } from "../index.js";
 import { type Chirps, chirps } from "../../schema.js";
-import { eq } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 import { NotFoundError } from "../../errors.js";
 
 export async function insertChirp(userChirp: Chirps) {
@@ -9,8 +9,15 @@ export async function insertChirp(userChirp: Chirps) {
   return result;
 }
 
-export async function getChirps() {
-  const result: Chirps[] = await db.select().from(chirps);
+export async function getChirps(userId?: string, sort?: string) {
+  const baseQuery = db.select().from(chirps);
+  const filteredQuery = userId
+    ? baseQuery.where(eq(chirps.userId, userId))
+    : baseQuery;
+
+  const order =
+    sort === "desc" ? desc(chirps.createdAt) : asc(chirps.createdAt);
+  const result = await filteredQuery.orderBy(order).execute();
   if (!result) throw new Error("Failed to get chirps...");
   return result;
 }

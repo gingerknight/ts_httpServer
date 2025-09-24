@@ -41,7 +41,18 @@ export async function handlerAllChirps(req: Request, res: Response) {
     }
   ]
   */
-  const chirps = await getChirps();
+  // If user passes a uderId then get chirps with that userId uuid
+  // GET http://localhost:8080/api/chirps?authorId=1
+  const Query = z.object({
+    authorId: z.coerce.string().optional(),
+    sort: z.union([z.literal("desc"), z.literal("asc")]).optional(),
+  });
+  const queryParams = Query.safeParse(req.query);
+  console.log(`queryParams: ${JSON.stringify(queryParams)}`);
+  const chirps = await getChirps(
+    queryParams.data?.authorId,
+    queryParams.data?.sort
+  );
   res.json(chirps);
 }
 
